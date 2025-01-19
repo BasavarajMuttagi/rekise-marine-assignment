@@ -12,7 +12,7 @@ import LineStringTable from "./LineStringTable";
 
 export default function MissionModal() {
   return (
-    <Dialog open={true}>
+    <Dialog open={true} modal={false}>
       <DialogContent className="w-full max-w-xl [&>button]:hidden">
         <DialogHeader>
           <div className="flex items-center justify-between">
