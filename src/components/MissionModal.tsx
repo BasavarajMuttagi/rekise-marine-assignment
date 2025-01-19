@@ -12,7 +12,7 @@ import LineStringTable from "./LineStringTable";
 
 export default function MissionModal() {
   return (
-    <Dialog defaultOpen>
+    <Dialog open={true}>
       <DialogContent className="w-full max-w-xl [&>button]:hidden">
         <DialogHeader>
           <div className="flex items-center justify-between">
@@ -35,13 +35,8 @@ export default function MissionModal() {
         <div className="flex flex-col space-y-4">
           <h3 className="text-sm font-semibold">Waypoint Navigation</h3>
           <div className="flex-1">
-            <LineStringTable />
-          </div>
-          <div className="rounded-md border border-dashed border-zinc-500/40 bg-muted p-4">
-            <p className="text-xs text-muted-foreground">
-              Click on the map to mark points of the route and then press ↵
-              complete the route.
-            </p>
+            <LineStringTable data={data} />
+            <MissionModalCallout />
           </div>
         </div>
         <DialogFooter className="flex justify-end">
@@ -53,3 +48,112 @@ export default function MissionModal() {
     </Dialog>
   );
 }
+
+const MissionModalCallout = () => (
+  <div className="rounded-md border border-dashed border-zinc-500/40 bg-muted p-4">
+    <p className="text-xs text-muted-foreground">
+      Click on the map to mark points of the route and then press ↵ complete the
+      route.
+    </p>
+  </div>
+);
+
+const data = [
+  {
+    wp: "00",
+    coordinates: {
+      x: 12.97169189,
+      y: 12.97169189,
+    },
+    distance: null,
+  },
+  {
+    wp: "01",
+    coordinates: {
+      x: 12.97169189,
+      y: 12.97169189,
+    },
+    distance: 15.5,
+  },
+  {
+    wp: "02",
+    coordinates: {
+      x: 12.97169189,
+      y: 12.97169189,
+    },
+    distance: 8.3,
+  },
+  {
+    wp: "03",
+    coordinates: {
+      x: 12.97169189,
+      y: 12.97169189,
+    },
+    distance: 3.5,
+  },
+  {
+    wp: "04",
+    coordinates: {
+      x: 12.97169189,
+      y: 12.97169189,
+    },
+    distance: null,
+  },
+  {
+    wp: "05",
+    coordinates: {
+      x: 12.97169189,
+      y: 12.97169189,
+    },
+    distance: 15.5,
+  },
+  {
+    wp: "06",
+    coordinates: {
+      x: 12.97169189,
+      y: 12.97169189,
+    },
+    distance: 8.3,
+  },
+  {
+    wp: "07",
+    coordinates: {
+      x: 12.97169189,
+      y: 12.97169189,
+    },
+    distance: 3.5,
+  },
+
+  {
+    wp: "08",
+    coordinates: {
+      x: 12.97169189,
+      y: 12.97169189,
+    },
+    distance: null,
+  },
+  {
+    wp: "09",
+    coordinates: {
+      x: 12.97169189,
+      y: 12.97169189,
+    },
+    distance: 15.5,
+  },
+  {
+    wp: "10",
+    coordinates: {
+      x: 12.97169189,
+      y: 12.97169189,
+    },
+    distance: 8.3,
+  },
+  {
+    wp: "11",
+    coordinates: {
+      x: 12.97169189,
+      y: 12.97169189,
+    },
+    distance: 3.5,
+  },
+];

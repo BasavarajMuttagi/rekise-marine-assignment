@@ -14,22 +14,10 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowLeftToLine,
-  ArrowRightToLine,
-  EllipsisVertical,
-  Upload,
-} from "lucide-react";
-import { Button } from "./ui/button";
 import { Checkbox } from "./ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
 import { ScrollArea } from "./ui/scroll-area";
-export type LineString = {
+
+type LineString = {
   wp: string;
   coordinates: {
     x: number;
@@ -84,27 +72,15 @@ const columns: ColumnDef<LineString>[] = [
       return <div className="text-center">{distance ?? "--"}</div>;
     },
   },
-  {
-    id: "actions",
-    header: () => (
-      <div className="flex justify-center">
-        <Upload size={16} className="text-blue-500" />
-      </div>
-    ),
-    cell: () => (
-      <div className="text-center">
-        <Options />
-      </div>
-    ),
-  },
 ];
 
-export function LineStringTable({ data }: { data: LineString[] }) {
+export function PolygonTable({ data }: { data: LineString[] }) {
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
+
   if (data.length <= 0) {
     return null;
   }
@@ -116,7 +92,7 @@ export function LineStringTable({ data }: { data: LineString[] }) {
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <TableHead key={header.id} className="p-0 text-zinc-800">
+                <TableHead key={header.id} className="text-zinc-800">
                   {header.isPlaceholder
                     ? null
                     : flexRender(
@@ -137,7 +113,7 @@ export function LineStringTable({ data }: { data: LineString[] }) {
               className="text-xs text-zinc-800"
             >
               {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id} className="p-0">
+                <TableCell key={cell.id}>
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>
               ))}
@@ -149,23 +125,4 @@ export function LineStringTable({ data }: { data: LineString[] }) {
   );
 }
 
-export default LineStringTable;
-
-const Options = () => (
-  <DropdownMenu>
-    <DropdownMenuTrigger asChild>
-      <Button variant="ghost" size="sm" className="p-1.5">
-        <EllipsisVertical className="text-zinc-700" />
-      </Button>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent side="right" align="start">
-      <DropdownMenuItem>
-        <ArrowLeftToLine />
-        <span>Insert Polygon Before</span>
-      </DropdownMenuItem>
-      <DropdownMenuItem>
-        <ArrowRightToLine /> <span>Insert Polygon After</span>
-      </DropdownMenuItem>
-    </DropdownMenuContent>
-  </DropdownMenu>
-);
+export default PolygonTable;
