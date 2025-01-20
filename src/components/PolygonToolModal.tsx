@@ -6,21 +6,34 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import useMapStore from "@/store";
 import { MoveLeft } from "lucide-react";
 import PolygonTable from "./PolygonTable";
 
-export default function PolygonToolModal({
-  setShowPolygon,
-}: {
-  setShowPolygon: () => void;
-}) {
+export default function PolygonToolModal() {
+  const {
+    showPolygonModal,
+    setShowPolygonModal,
+    setShowMissionModal,
+    setDrawType,
+    setPolygonStringArray,
+    setSelectedPolygon,
+  } = useMapStore();
+
+  const handleDiscard = () => {
+    setShowPolygonModal(false);
+    setShowMissionModal(true);
+    setDrawType("LineString");
+    setPolygonStringArray([]);
+    setSelectedPolygon(null);
+  };
   return (
-    <Dialog modal={false} open={true}>
+    <Dialog modal={false} open={showPolygonModal}>
       <DialogContent className="w-full max-w-xl [&>button]:hidden">
         <DialogHeader>
           <div>
             <div
-              onClick={() => setShowPolygon()}
+              onClick={handleDiscard}
               role="button"
               className="inline-flex items-center space-x-2 text-zinc-500"
             >
@@ -34,7 +47,7 @@ export default function PolygonToolModal({
         <hr className="border-t-2 border-zinc-200 dark:border-zinc-700" />
         <div className="flex flex-col space-y-4">
           <div className="flex-1">
-            <PolygonTable data={[]} />
+            <PolygonTable />
             <div className="p-2"></div>
             <PolygonToolCallout />
           </div>
@@ -42,7 +55,11 @@ export default function PolygonToolModal({
         <hr className="border-t border-zinc-200 dark:border-zinc-700" />
         <DialogFooter>
           <div className="flex w-full items-center justify-between">
-            <Button variant="ghost" className="text-zinc-500">
+            <Button
+              variant="ghost"
+              className="text-zinc-500"
+              onClick={handleDiscard}
+            >
               Discard
             </Button>
             <Button className="bg-[#1A75A8] px-5 hover:bg-[#3e6d89]">

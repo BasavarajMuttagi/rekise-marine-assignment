@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import useMapStore, { LineStringType } from "@/store";
 import {
   ColumnDef,
   flexRender,
@@ -17,16 +18,7 @@ import {
 import { Checkbox } from "./ui/checkbox";
 import { ScrollArea } from "./ui/scroll-area";
 
-type LineString = {
-  wp: string;
-  coordinates: {
-    x: number;
-    y: number;
-  };
-  distance: number | null;
-};
-
-const columns: ColumnDef<LineString>[] = [
+const columns: ColumnDef<LineStringType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -57,11 +49,10 @@ const columns: ColumnDef<LineString>[] = [
     accessorKey: "coordinates",
     header: "Coordinates",
     cell: ({ row }) => {
-      const coordinates = row.getValue("coordinates") as {
-        x: number;
-        y: number;
-      };
-      return `${coordinates.x}, ${coordinates.y}`;
+      const coordinates = row.getValue("coordinates");
+      if (Array.isArray(coordinates)) return;
+      const data = coordinates as { x: number; y: number };
+      return `${data.x}, ${data.y}`;
     },
   },
   {
@@ -74,53 +65,56 @@ const columns: ColumnDef<LineString>[] = [
   },
 ];
 
-export function PolygonTable({ data }: { data: LineString[] }) {
+export function PolygonTable() {
+  const { polygonStringArray } = useMapStore();
   const table = useReactTable({
-    data,
+    data: polygonStringArray,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
 
-  if (data.length <= 0) {
+  if (polygonStringArray.length <= 0) {
     return null;
   }
 
   return (
-    <ScrollArea className="h-full max-h-[250px] min-h-10 w-full pb-2">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead key={header.id} className="text-zinc-800">
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
+    <ScrollArea className="max-h-64 w-full">
+      <div className="max-h-64">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} className="text-zinc-800">
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
 
-        <TableBody>
-          {table.getRowModel().rows.map((row) => (
-            <TableRow
-              key={row.id}
-              data-state={row.getIsSelected() && "selected"}
-              className="text-xs text-zinc-800"
-            >
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          <TableBody>
+            {table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+                className="text-xs text-zinc-800"
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </ScrollArea>
   );
 }

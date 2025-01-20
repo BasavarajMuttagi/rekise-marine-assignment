@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Table,
   TableBody,
@@ -8,6 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import useMapStore, { LineStringType } from "@/store";
 import {
   ColumnDef,
   flexRender,
@@ -29,16 +28,8 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { ScrollArea } from "./ui/scroll-area";
-export type LineString = {
-  wp: string;
-  coordinates: {
-    x: number;
-    y: number;
-  };
-  distance: number | null;
-};
 
-const columns: ColumnDef<LineString>[] = [
+const columns: ColumnDef<LineStringType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -69,11 +60,19 @@ const columns: ColumnDef<LineString>[] = [
     accessorKey: "coordinates",
     header: "Coordinates",
     cell: ({ row }) => {
-      const coordinates = row.getValue("coordinates") as {
-        x: number;
-        y: number;
-      };
-      return `${coordinates.x}, ${coordinates.y}`;
+      const coordinates = row.getValue("coordinates");
+      if (!coordinates) return "Polygon";
+
+      if (Array.isArray(coordinates)) {
+        return (
+          <div className="pl-4">
+            <LineStringTable data={coordinates} />
+          </div>
+        );
+      }
+
+      const data = coordinates as { x: number; y: number };
+      return `${data.x}, ${data.y}`;
     },
   },
   {
@@ -91,15 +90,17 @@ const columns: ColumnDef<LineString>[] = [
         <Upload size={16} className="text-blue-500" />
       </div>
     ),
-    cell: () => (
-      <div className="text-center">
-        <Options />
-      </div>
-    ),
+    cell: ({ row }) => {
+      return (
+        <div className="text-center">
+          <Options {...row.original} />
+        </div>
+      );
+    },
   },
 ];
 
-export function LineStringTable({ data }: { data: LineString[] }) {
+export function LineStringTable({ data }: { data: LineStringType[] }) {
   const table = useReactTable({
     data,
     columns,
@@ -153,21 +154,41 @@ export function LineStringTable({ data }: { data: LineString[] }) {
 
 export default LineStringTable;
 
-const Options = () => (
-  <DropdownMenu>
-    <DropdownMenuTrigger asChild>
-      <Button variant="ghost" size="sm" className="p-1.5">
-        <EllipsisVertical className="text-zinc-700" />
-      </Button>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent side="right" align="start">
-      <DropdownMenuItem>
-        <ArrowLeftToLine />
-        <span>Insert Polygon Before</span>
-      </DropdownMenuItem>
-      <DropdownMenuItem>
-        <ArrowRightToLine /> <span>Insert Polygon After</span>
-      </DropdownMenuItem>
-    </DropdownMenuContent>
-  </DropdownMenu>
-);
+const Options = (row: LineStringType) => {
+  const {
+    setSelectedPolygon,
+    setShowMissionModal,
+    setShowPolygonModal,
+    setDrawType,
+  } = useMapStore();
+  const handleSelect = (value: "before" | "after") => {
+    setSelectedPolygon({ LineString: row, position: value });
+    setShowMissionModal(false);
+    setShowPolygonModal(true);
+    setDrawType("Polygon");
+  };
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="sm" className="p-1.5">
+          <EllipsisVertical className="text-zinc-700" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="right" align="start">
+        <DropdownMenuItem
+          textValue="before"
+          onSelect={() => handleSelect("before")}
+        >
+          <ArrowLeftToLine />
+          <span>Insert Polygon Before</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          textValue="after"
+          onSelect={() => handleSelect("after")}
+        >
+          <ArrowRightToLine /> <span>Insert Polygon After</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};

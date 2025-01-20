@@ -1,7 +1,7 @@
 import useMapStore from "@/store";
 import Map from "ol/Map";
 import View from "ol/View";
-import { LineString } from "ol/geom";
+import { LineString, Polygon } from "ol/geom";
 import Draw from "ol/interaction/Draw";
 import TileLayer from "ol/layer/Tile";
 import VectorLayer from "ol/layer/Vector";
@@ -11,16 +11,22 @@ import VectorSource from "ol/source/Vector";
 import { Fill, Stroke, Style } from "ol/style";
 import { useEffect, useRef, useState } from "react";
 import MissionModal from "./MissionModal";
+import PolygonToolModal from "./PolygonToolModal";
 
 const OpenLayersMap = () => {
   const mapElementRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | null>(null);
   const drawRef = useRef<Draw | null>(null);
   const vectorSource = useRef(new VectorSource());
-  const [drawType] = useState<"LineString" | "Polygon">("LineString");
   const [isDrawing, setIsDrawing] = useState(false);
-  const [isShow, setShow] = useState(true);
-  const { setLineStringArray, lineStringArray } = useMapStore();
+
+  const {
+    setLineStringArray,
+    setPolygonStringArray,
+    setShowMissionModal,
+    setShowPolygonModal,
+    drawType,
+  } = useMapStore();
   useEffect(() => {
     if (!mapElementRef.current) return;
 
@@ -62,11 +68,11 @@ const OpenLayersMap = () => {
         drawRef.current.finishDrawing();
         setIsDrawing(false);
 
-        // Remove the draw interaction after completion
-        if (mapRef.current && drawRef.current) {
-          mapRef.current.removeInteraction(drawRef.current);
-          drawRef.current = null;
-        }
+        // // Remove the draw interaction after completion
+        // if (mapRef.current && drawRef.current) {
+        //   mapRef.current.removeInteraction(drawRef.current);
+        //   drawRef.current = null;
+        // }
       }
     };
 
@@ -102,7 +108,14 @@ const OpenLayersMap = () => {
         const geometry = event.feature.getGeometry() as LineString;
         const coordinates = geometry.getCoordinates();
         setLineStringArray(coordinates);
-        setShow(true);
+        setShowMissionModal(true);
+      }
+
+      if (drawType === "Polygon") {
+        const geometry = event.feature.getGeometry() as Polygon;
+        const coordinates = geometry.getCoordinates()[0];
+        setPolygonStringArray(coordinates);
+        setShowPolygonModal(true);
       }
     });
 
@@ -114,7 +127,13 @@ const OpenLayersMap = () => {
         mapRef.current.removeInteraction(draw);
       }
     };
-  }, [drawType, setLineStringArray]);
+  }, [
+    drawType,
+    setLineStringArray,
+    setPolygonStringArray,
+    setShowMissionModal,
+    setShowPolygonModal,
+  ]);
 
   return (
     <>
@@ -126,7 +145,8 @@ const OpenLayersMap = () => {
           position: "relative",
         }}
       />
-      <MissionModal data={lineStringArray} isShow={isShow} setShow={setShow} />
+      <MissionModal />
+      <PolygonToolModal />
     </>
   );
 };

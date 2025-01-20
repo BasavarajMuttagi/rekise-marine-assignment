@@ -7,21 +7,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { LineStringType } from "@/store";
+import useMapStore from "@/store";
 import { X } from "lucide-react";
 import LineStringTable from "./LineStringTable";
 
-export default function MissionModal({
-  data,
-  isShow,
-  setShow,
-}: {
-  data: LineStringType[];
-  isShow: boolean;
-  setShow: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
+export default function MissionModal() {
+  const { setShowMissionModal, showMissionModal, lineStringArray } =
+    useMapStore();
   return (
-    <Dialog open={isShow} modal={false}>
+    <Dialog open={showMissionModal} modal={false}>
       <DialogContent className="w-full max-w-xl [&>button]:hidden">
         <DialogHeader>
           <div className="flex items-center justify-between">
@@ -33,7 +27,7 @@ export default function MissionModal({
                 variant="ghost"
                 size="icon"
                 className="h-6 w-6 rounded-md p-0"
-                onClick={() => setShow(false)}
+                onClick={() => setShowMissionModal(false)}
               >
                 <X className="h-4 w-4" />
                 <span className="sr-only">Close</span>
@@ -45,7 +39,7 @@ export default function MissionModal({
         <div className="flex flex-col space-y-4">
           <h3 className="text-sm font-semibold">Waypoint Navigation</h3>
           <div className="flex-1 space-y-2">
-            <LineStringTable data={data} />
+            <LineStringTable data={lineStringArray} />
             <MissionModalCallout />
           </div>
         </div>
@@ -53,10 +47,10 @@ export default function MissionModal({
           <Button
             className="bg-[#6C5CE7] px-5 hover:bg-[#5A4BD1]"
             onClick={() => {
-              if (data.length > 0) {
-                alert(data);
+              if (lineStringArray.length > 0) {
+                alert(lineStringArray);
               } else {
-                setShow(false);
+                setShowMissionModal(false);
               }
             }}
           >
