@@ -9,10 +9,19 @@ import {
 } from "@/components/ui/dialog";
 import { X } from "lucide-react";
 import LineStringTable from "./LineStringTable";
+import { LineStringType } from "./OpenLayersMap";
 
-export default function MissionModal() {
+export default function MissionModal({
+  data,
+  isShow,
+  setShow,
+}: {
+  data: LineStringType[];
+  isShow: boolean;
+  setShow: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   return (
-    <Dialog open={true} modal={false}>
+    <Dialog open={isShow} modal={false}>
       <DialogContent className="w-full max-w-xl [&>button]:hidden">
         <DialogHeader>
           <div className="flex items-center justify-between">
@@ -24,6 +33,7 @@ export default function MissionModal() {
                 variant="ghost"
                 size="icon"
                 className="h-6 w-6 rounded-md p-0"
+                onClick={() => setShow(false)}
               >
                 <X className="h-4 w-4" />
                 <span className="sr-only">Close</span>
@@ -34,13 +44,22 @@ export default function MissionModal() {
         <hr className="border-t-2 border-zinc-200 dark:border-zinc-700" />
         <div className="flex flex-col space-y-4">
           <h3 className="text-sm font-semibold">Waypoint Navigation</h3>
-          <div className="flex-1">
+          <div className="flex-1 space-y-2">
             <LineStringTable data={data} />
             <MissionModalCallout />
           </div>
         </div>
         <DialogFooter className="flex justify-end">
-          <Button className="bg-[#6C5CE7] px-5 hover:bg-[#5A4BD1]">
+          <Button
+            className="bg-[#6C5CE7] px-5 hover:bg-[#5A4BD1]"
+            onClick={() => {
+              if (data.length > 0) {
+                alert(data);
+              } else {
+                setShow(false);
+              }
+            }}
+          >
             Generate Data
           </Button>
         </DialogFooter>
@@ -57,103 +76,3 @@ const MissionModalCallout = () => (
     </p>
   </div>
 );
-
-const data = [
-  {
-    wp: "00",
-    coordinates: {
-      x: 12.97169189,
-      y: 12.97169189,
-    },
-    distance: null,
-  },
-  {
-    wp: "01",
-    coordinates: {
-      x: 12.97169189,
-      y: 12.97169189,
-    },
-    distance: 15.5,
-  },
-  {
-    wp: "02",
-    coordinates: {
-      x: 12.97169189,
-      y: 12.97169189,
-    },
-    distance: 8.3,
-  },
-  {
-    wp: "03",
-    coordinates: {
-      x: 12.97169189,
-      y: 12.97169189,
-    },
-    distance: 3.5,
-  },
-  {
-    wp: "04",
-    coordinates: {
-      x: 12.97169189,
-      y: 12.97169189,
-    },
-    distance: null,
-  },
-  {
-    wp: "05",
-    coordinates: {
-      x: 12.97169189,
-      y: 12.97169189,
-    },
-    distance: 15.5,
-  },
-  {
-    wp: "06",
-    coordinates: {
-      x: 12.97169189,
-      y: 12.97169189,
-    },
-    distance: 8.3,
-  },
-  {
-    wp: "07",
-    coordinates: {
-      x: 12.97169189,
-      y: 12.97169189,
-    },
-    distance: 3.5,
-  },
-
-  {
-    wp: "08",
-    coordinates: {
-      x: 12.97169189,
-      y: 12.97169189,
-    },
-    distance: null,
-  },
-  {
-    wp: "09",
-    coordinates: {
-      x: 12.97169189,
-      y: 12.97169189,
-    },
-    distance: 15.5,
-  },
-  {
-    wp: "10",
-    coordinates: {
-      x: 12.97169189,
-      y: 12.97169189,
-    },
-    distance: 8.3,
-  },
-  {
-    wp: "11",
-    coordinates: {
-      x: 12.97169189,
-      y: 12.97169189,
-    },
-    distance: 3.5,
-  },
-];
