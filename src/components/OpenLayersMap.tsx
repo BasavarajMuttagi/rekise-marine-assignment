@@ -1,6 +1,6 @@
+import useMapStore from "@/store";
 import Map from "ol/Map";
 import View from "ol/View";
-import { Coordinate } from "ol/coordinate";
 import { LineString } from "ol/geom";
 import Draw from "ol/interaction/Draw";
 import TileLayer from "ol/layer/Tile";
@@ -8,18 +8,10 @@ import VectorLayer from "ol/layer/Vector";
 import "ol/ol.css";
 import OSM from "ol/source/OSM";
 import VectorSource from "ol/source/Vector";
-import { getLength } from "ol/sphere";
 import { Fill, Stroke, Style } from "ol/style";
 import { useEffect, useRef, useState } from "react";
 import MissionModal from "./MissionModal";
-export type LineStringType = {
-  wp: string;
-  coordinates: {
-    x: number;
-    y: number;
-  };
-  distance: null | number;
-};
+
 const OpenLayersMap = () => {
   const mapElementRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | null>(null);
@@ -27,10 +19,8 @@ const OpenLayersMap = () => {
   const vectorSource = useRef(new VectorSource());
   const [drawType] = useState<"LineString" | "Polygon">("LineString");
   const [isDrawing, setIsDrawing] = useState(false);
-  const [mission, setMission] = useState<Coordinate[]>([]);
-  const [formattedData, setFormattedData] = useState<LineStringType[]>([]);
   const [isShow, setShow] = useState(true);
-
+  const { setLineStringArray, lineStringArray } = useMapStore();
   useEffect(() => {
     if (!mapElementRef.current) return;
 
@@ -111,7 +101,7 @@ const OpenLayersMap = () => {
       if (drawType === "LineString") {
         const geometry = event.feature.getGeometry() as LineString;
         const coordinates = geometry.getCoordinates();
-        setMission(coordinates);
+        setLineStringArray(coordinates);
         setShow(true);
       }
     });
@@ -124,12 +114,8 @@ const OpenLayersMap = () => {
         mapRef.current.removeInteraction(draw);
       }
     };
-  }, [drawType]);
+  }, [drawType, setLineStringArray]);
 
-  useEffect(() => {
-    const data = formatLineStringData(mission);
-    setFormattedData(data);
-  }, [mission]);
   return (
     <>
       <div
@@ -140,34 +126,9 @@ const OpenLayersMap = () => {
           position: "relative",
         }}
       />
-      <MissionModal data={formattedData} isShow={isShow} setShow={setShow} />
+      <MissionModal data={lineStringArray} isShow={isShow} setShow={setShow} />
     </>
   );
 };
 
 export default OpenLayersMap;
-
-const formatLineStringData = (coordinates: Coordinate[]): LineStringType[] => {
-  const points: LineStringType[] = [];
-
-  coordinates.forEach((coord, index) => {
-    const point: LineStringType = {
-      wp: `WP${index + 1}`,
-      coordinates: {
-        x: coord[0],
-        y: coord[1],
-      },
-      distance: null,
-    };
-
-    if (index > 0) {
-      const line = new LineString([coordinates[index - 1], coord]);
-      const distance = getLength(line);
-      point.distance = Math.round(distance * 100) / 100;
-    }
-
-    points.push(point);
-  });
-
-  return points;
-};

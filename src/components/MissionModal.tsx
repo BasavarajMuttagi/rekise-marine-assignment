@@ -7,9 +7,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { LineStringType } from "@/store";
 import { X } from "lucide-react";
 import LineStringTable from "./LineStringTable";
-import { LineStringType } from "./OpenLayersMap";
 
 export default function MissionModal({
   data,
